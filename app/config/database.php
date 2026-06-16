@@ -3,7 +3,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', ''); // Kosongkan jika pakai bawaan XAMPP
-define('DB_NAME', 'perpus_online');
+define('DB_NAME', 'perpus-online');
 
 class Database {
     private $host = DB_HOST;
