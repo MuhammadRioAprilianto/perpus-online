@@ -1,122 +1,112 @@
 <?php
-require_once '../app/models/UserModel.php';
-require_once '../app/config/database.php';
 
 class AuthController {
     private $userModel;
 
     public function __construct() {
-        // Menginisiasi koneksi database dan Data Access Layer (DAL)
-        $db = new Database();
-        $this->userModel = new UserModel($db->getConnection());
+        // Panggil UserModel yang sudah kita perbarui sebelumnya
+        require_once '../app/models/UserModel.php';
+        $this->userModel = new UserModel();
+        
+        // Pastikan session sudah berjalan di setiap proses auth
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
-    // Menampilkan halaman login (Bisa digunakan bersama oleh Admin & User)
+    // Menangani halaman dan proses Login
     public function login() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        // Logika Bisnis: Jika sudah login, langsung alihkan sesuai role-nya
+        // Jika user sudah login, tendang sesuai role-nya
         if (isset($_SESSION['user_id'])) {
-            if ($_SESSION['role'] === 'admin') {
-                header('Location: ' . BASEURL . '/admin/dashboard');
-            } else {
-                header('Location: ' . BASEURL . '/');
-            }
-            exit;
-        }
-
-        // Memanggil Presentation Layer (Tampilan Login)
-        require_once '../app/views/auth/login.php';
-    }
-
-    // Memproses data form login
-    public function processLogin() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            $this->redirectBasedOnRole();
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $username = trim($_POST['username']);
-            $password = trim($_POST['password']);
+            // Sanitasi input email
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            $password = $_POST['password'];
 
-            // Mengambil data dari DAL (Data Access Layer)
-            $user = $this->userModel->findByUsername($username);
+            // Cari user berdasarkan email
+            $user = $this->userModel->findByEmail($email);
 
-            // Logika Bisnis (BLL): Validasi akun dan kecocokan password_hash
+            // Verifikasi password yang di-hash (krusial untuk keamanan)
             if ($user && password_verify($password, $user['password'])) {
-                // Menyimpan data kredensial ke dalam Session
+                // Set variabel session
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['user_name'] = $user['name'];
 
-                // Pengalihan hak akses sesuai spesifikasi di dokumen
-                if ($user['role'] === 'admin') {
-                    header('Location: ' . BASEURL . '/admin/dashboard');
-                } else {
-                    header('Location: ' . BASEURL . '/');
-                }
-                exit;
+                $this->redirectBasedOnRole();
             } else {
                 // Jika gagal, kembalikan ke halaman login dengan pesan error
-                header('Location: ' . BASEURL . '/login?error=invalid_credentials');
-                exit;
+                header("Location: /perpus-online/public/login?status=error");
+                exit();
             }
+        } else {
+            // Tampilkan view form login
+            require_once '../app/views/auth/login.php';
         }
     }
 
-    // Menampilkan halaman registrasi akun untuk User (Pembaca)
+    // Menangani halaman dan proses Register (Khusus Member)
     public function register() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if (isset($_SESSION['user_id'])) {
-            header('Location: ' . BASEURL . '/');
-            exit;
+            $this->redirectBasedOnRole();
         }
 
-        // Memanggil Presentation Layer (Tampilan Register)
-        require_once '../app/views/auth/register.php';
-    }
-
-    // Memproses pengajuan pembuatan akun baru oleh User
-    public function processRegister() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $username = trim($_POST['username']);
-            $password = trim($_POST['password']);
+            $name = htmlspecialchars($_POST['name']);
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            $password = $_POST['password'];
+            $confirm_password = $_POST['confirm_password'];
 
-            // Logika Bisnis: Validasi apakah username sudah terdaftar atau belum
-            $existingUser = $this->userModel->findByUsername($username);
-            if ($existingUser) {
-                header('Location: ' . BASEURL . '/register?error=username_taken');
-                exit;
+            // Validasi password match
+            if ($password !== $confirm_password) {
+                header("Location: /perpus-online/public/register?status=password_mismatch");
+                exit();
             }
 
-            // Jika username aman, kirim data ke DAL untuk dieksekusi ke database
-            if ($this->userModel->register($username, $password)) {
-                header('Location: ' . BASEURL . '/login?success=registered');
-                exit;
+            // Cek apakah email sudah terdaftar
+            if ($this->userModel->findByEmail($email)) {
+                header("Location: /perpus-online/public/register?status=email_exists");
+                exit();
+            }
+
+            // Eksekusi registrasi
+            if ($this->userModel->register($name, $email, $password)) {
+                header("Location: /perpus-online/public/login?status=registered");
             } else {
-                header('Location: ' . BASEURL . '/register?error=failed');
-                exit;
+                header("Location: /perpus-online/public/register?status=error");
             }
+            exit();
+        } else {
+            // Tampilkan view form register
+            require_once '../app/views/auth/register.php';
         }
     }
 
-    // Memproses Logout aplikasi
+    // Menangani proses Logout
     public function logout() {
-        if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         
         // Hapus semua data session
-        $_SESSION = [];
+        $_SESSION = array();
         session_destroy();
+        
+        // Redirect ke halaman utama / login
+        header("Location: /perpus-online/public/login");
+        exit();
+    }
 
-        // Alihkan kembali ke halaman login
-        header('Location: ' . BASEURL . '/login');
-        exit;
+    // Fungsi helper untuk routing otomatis berdasarkan role
+    private function redirectBasedOnRole() {
+        if ($_SESSION['user_role'] == 'admin') {
+            header("Location: /perpus-online/public/admin/dashboard");
+        } else {
+            header("Location: /perpus-online/public/");
+        }
+        exit();
     }
 }
