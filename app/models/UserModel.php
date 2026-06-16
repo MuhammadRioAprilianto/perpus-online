@@ -25,4 +25,11 @@ class UserModel {
         
         return $this->db->single();
     }
+
+    // Menghitung total akun yang berstatus member
+    public function getTotalMembers() {
+        $this->db->query("SELECT COUNT(*) as total FROM users WHERE role = 'member'");
+        $result = $this->db->single();
+        return $result['total'];
+    }
 }

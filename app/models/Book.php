@@ -68,4 +68,11 @@ class Book {
         
         return $this->db->execute();
     }
+
+    // Menghitung total buku di katalog
+    public function getTotalBooks() {
+        $this->db->query("SELECT COUNT(*) as total FROM books");
+        $result = $this->db->single();
+        return $result['total'];
+    }
 }
