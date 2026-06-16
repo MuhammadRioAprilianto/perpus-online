@@ -1,9 +1,20 @@
 <?php
 // Konfigurasi Database
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', ''); // Kosongkan jika pakai bawaan XAMPP
-define('DB_NAME', 'perpus-online');
+// Deteksi apakah sedang berjalan di local (localhost) atau di cPanel (production)
+$isLocal = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', '::1']) || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] === '127.0.0.1');
+
+if ($isLocal) {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', ''); // Kosongkan jika pakai bawaan XAMPP
+    define('DB_NAME', 'perpus-online');
+} else {
+    // Konfigurasi Database cPanel Production
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'pdwp8946_PerpusAdminK5');
+    define('DB_PASS', 'Kelompok5!');
+    define('DB_NAME', 'pdwp8946_perpus-online');
+}
 
 class Database {
     private $host = DB_HOST;
