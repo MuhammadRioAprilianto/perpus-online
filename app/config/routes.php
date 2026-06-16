@@ -23,5 +23,10 @@ $routes = [
     // Manajemen Peminjaman (Admin)
     'admin/loans' => ['LoanController', 'index'],
     'admin/loans/approve' => ['LoanController', 'approve'], // Konfirmasi pinjaman
-    'admin/loans/return' => ['LoanController', 'returnBook'] // Konfirmasi pengembalian
+    'admin/loans/return' => ['LoanController', 'returnBook'], // Konfirmasi pengembalian
+
+    // Cart Routes (Keranjang) ---
+    'cart' => ['CartController', 'index'],
+    'cart/add' => ['CartController', 'add'],
+    'cart/remove' => ['CartController', 'remove']
 ];

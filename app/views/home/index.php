@@ -30,7 +30,7 @@
                     <?php else: ?>
                         <a href="/perpus-online/public/cart" class="text-main hover:text-primary font-medium transition-colors relative flex items-center gap-2">
                             🛒 Keranjang
-                            </a>
+                        </a>
                     <?php endif; ?>
                     
                     <a href="/perpus-online/public/logout" class="ml-4 text-red-500 hover:text-red-700 font-medium transition-colors text-sm">Logout</a>
@@ -49,6 +49,24 @@
             <div class="text-6xl md:text-8xl drop-shadow-lg">📚</div>
         </div>
 
+        <?php if(isset($_GET['status'])): ?>
+            <?php if($_GET['status'] == 'added_to_cart'): ?>
+                <div class="mb-8 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <span class="font-medium">✅ Buku berhasil ditambahkan ke keranjang!</span>
+                    <a href="/perpus-online/public/cart" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold transition-colors text-sm whitespace-nowrap">
+                        Lihat Keranjang &rarr;
+                    </a>
+                </div>
+            <?php elseif($_GET['status'] == 'cart_full'): ?>
+                <div class="mb-8 p-4 bg-red-50 text-red-600 rounded-xl border border-red-200 flex items-center">
+                    <span class="font-medium">⚠️ Keranjang penuh! Maksimal peminjaman adalah 3 buku.</span>
+                </div>
+            <?php elseif($_GET['status'] == 'already_in_cart'): ?>
+                <div class="mb-8 p-4 bg-accent/10 text-accent rounded-xl border border-accent/20 flex items-center">
+                    <span class="font-medium">ℹ️ Buku ini sudah ada di dalam keranjang Anda.</span>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
         <form method="GET" action="/perpus-online/public/" class="mb-10 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
             
             <div class="flex-1 w-full relative">
