@@ -9,9 +9,12 @@ class Book {
 
     // Mengambil buku dengan dukungan pencarian dan filter kategori
     public function getAllBooks($search = '', $categoryId = '') {
-        $query = "SELECT books.*, categories.name as category_name 
+        $query = "SELECT books.*, categories.name as category_name,
+                  COALESCE(AVG(reviews.rating), 0) as avg_rating,
+                  COUNT(reviews.id) as review_count
                   FROM books 
                   LEFT JOIN categories ON books.category_id = categories.id 
+                  LEFT JOIN reviews ON books.id = reviews.book_id
                   WHERE 1=1"; 
         
         if (!empty($search)) {
@@ -22,7 +25,7 @@ class Book {
             $query .= " AND books.category_id = :category_id";
         }
         
-        $query .= " ORDER BY books.created_at DESC";
+        $query .= " GROUP BY books.id ORDER BY books.created_at DESC";
         
         $this->db->query($query);
         

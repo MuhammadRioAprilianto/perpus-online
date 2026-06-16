@@ -10,6 +10,9 @@ $routes = [
 
     // --- Loan Routes (Peminjaman) ---
     'loan/request' => ['LoanController', 'requestLoan'], // User mengajukan pinjaman
+    'loans' => ['LoanController', 'myLoans'],            // Riwayat peminjaman user
+    'loans/review' => ['LoanController', 'addReview'],   // Member menulis ulasan buku
+    'book/detail' => ['BookController', 'detail'],       // Detail buku & ulasan (AJAX)
     
     // --- Admin Routes ---
     'admin/dashboard' => ['AdminController', 'index'],
@@ -28,5 +31,6 @@ $routes = [
     // Cart Routes (Keranjang) ---
     'cart' => ['CartController', 'index'],
     'cart/add' => ['CartController', 'add'],
-    'cart/remove' => ['CartController', 'remove']
+    'cart/remove' => ['CartController', 'remove'],
+    'checkout' => ['CheckoutController', 'index']
 ];

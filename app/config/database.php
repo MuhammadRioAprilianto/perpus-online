@@ -66,4 +66,8 @@ class Database {
         $this->execute();
         return $this->stmt->fetch();
     }
+
+    public function lastInsertId() {
+        return $this->dbh->lastInsertId();
+    }
 }

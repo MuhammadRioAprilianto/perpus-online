@@ -19,6 +19,7 @@
             </a>
             <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-500 mr-2 hidden md:block">Halo, <?= htmlspecialchars($_SESSION['user_name']) ?>!</span>
+                <a href="/perpus-online/public/loans" class="text-gray-500 hover:text-primary font-medium transition-colors">📋 Pinjamanku</a>
                 <a href="/perpus-online/public/cart" class="text-primary font-bold relative flex items-center gap-2">🛒 Keranjang</a>
                 <a href="/perpus-online/public/logout" class="ml-4 text-red-500 hover:text-red-700 font-medium transition-colors text-sm">Logout</a>
             </div>

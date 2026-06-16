@@ -28,6 +28,7 @@
                     <?php if($_SESSION['user_role'] == 'admin'): ?>
                         <a href="/perpus-online/public/admin/dashboard" class="bg-accent hover:bg-opacity-90 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition-all hover:-translate-y-0.5">Dashboard Admin</a>
                     <?php else: ?>
+                        <a href="/perpus-online/public/loans" class="text-gray-500 hover:text-primary font-medium transition-colors">📋 Pinjamanku</a>
                         <a href="/perpus-online/public/cart" class="text-main hover:text-primary font-medium transition-colors relative flex items-center gap-2">
                             🛒 Keranjang
                         </a>
@@ -137,9 +138,21 @@
                             <h3 class="font-bold text-lg leading-snug mb-1 line-clamp-2 text-main flex-1">
                                 <?= htmlspecialchars($book['title']) ?>
                             </h3>
-                            <p class="text-sm text-gray-500 mb-4 line-clamp-1">
+                            <p class="text-sm text-gray-500 mb-2 line-clamp-1">
                                 oleh <?= htmlspecialchars($book['author']) ?>
                             </p>
+                            
+                            <!-- Rating Bintang Rata-rata -->
+                            <div class="flex items-center gap-1 mb-4 text-xs text-gray-500">
+                                <span class="text-amber-400 text-sm">★</span>
+                                <span class="font-bold text-main"><?= number_format($book['avg_rating'], 1) ?></span>
+                                <span>(<?= $book['review_count'] ?> ulasan)</span>
+                            </div>
+
+                            <!-- Tombol Detail & Ulasan -->
+                            <button onclick="showBookDetail(<?= $book['id'] ?>)" class="w-full block text-center bg-gray-50 hover:bg-gray-100 text-gray-600 font-semibold py-2 rounded-xl text-xs mb-2 transition-colors border border-gray-100">
+                                ℹ️ Detail & Ulasan
+                            </button>
                             
                             <?php if($book['stock'] > 0): ?>
                                 <a href="/perpus-online/public/cart/add?id=<?= $book['id'] ?>" class="w-full block text-center bg-base hover:bg-accent hover:text-white text-main font-semibold py-2.5 rounded-xl transition-colors duration-300">
@@ -158,6 +171,142 @@
         </div>
 
     </main>
+
+    <!-- Modal Detail Buku & Ulasan -->
+    <div id="detailModal" class="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all scale-95 duration-300 flex flex-col max-h-[85vh]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-lg text-main">Detail & Ulasan Buku</h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold transition-colors">&times;</button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Info Buku -->
+                <div class="flex gap-4">
+                    <div class="w-20 h-28 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100" id="detail_cover_container">
+                        <!-- Cover Image -->
+                    </div>
+                    <div>
+                        <span class="bg-primary/10 text-primary px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider" id="detail_category">Kategori</span>
+                        <h4 class="font-bold text-lg text-main mt-2" id="detail_title">Judul Buku</h4>
+                        <p class="text-sm text-gray-500" id="detail_author">Penulis</p>
+                        <div class="flex items-center gap-1 mt-2 text-sm text-gray-500 flex-wrap">
+                            <span class="text-amber-400 text-lg">★</span>
+                            <span class="font-bold text-main" id="detail_avg_rating">0.0</span>
+                            <span id="detail_review_count">(0 ulasan)</span>
+                            <span class="mx-2 text-gray-300">|</span>
+                            <span>Stok:</span>
+                            <span class="font-bold text-main" id="detail_stock">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Ulasan -->
+                <div class="space-y-4">
+                    <h5 class="font-bold text-main border-b border-gray-100 pb-2">Ulasan Anggota</h5>
+                    <div id="reviews_list" class="space-y-4 max-h-[35vh] overflow-y-auto pr-1">
+                        <!-- Ulasan-ulasan -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3" id="detail_footer_action">
+                <!-- Action button (e.g. Pinjam) -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dModal = document.getElementById('detailModal');
+        const dContent = dModal.querySelector('.scale-95');
+
+        function showBookDetail(bookId) {
+            // Fetch book details via AJAX
+            fetch(`/perpus-online/public/book/detail?id=${bookId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const book = data.book;
+                        const reviews = data.reviews;
+
+                        // Set Book Info
+                        document.getElementById('detail_title').innerText = book.title;
+                        document.getElementById('detail_author').innerText = 'oleh ' + book.author;
+                        document.getElementById('detail_category').innerText = book.category_name || 'Umum';
+                        document.getElementById('detail_stock').innerText = book.stock;
+
+                        // Cover
+                        const coverCont = document.getElementById('detail_cover_container');
+                        if (book.cover_image) {
+                            coverCont.innerHTML = `<img src="/perpus-online/public/uploads/books/${book.cover_image}" class="w-full h-full object-cover">`;
+                        } else {
+                            coverCont.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">No Cover</div>`;
+                        }
+
+                        // Reviews list rendering
+                        const reviewsList = document.getElementById('reviews_list');
+                        if (reviews.length === 0) {
+                            reviewsList.innerHTML = `<p class="text-sm text-gray-400 italic text-center py-4">Belum ada ulasan untuk buku ini.</p>`;
+                            document.getElementById('detail_avg_rating').innerText = '0.0';
+                            document.getElementById('detail_review_count').innerText = '(0 ulasan)';
+                        } else {
+                            let totalRating = 0;
+                            let reviewsHTML = '';
+                            reviews.forEach(rev => {
+                                totalRating += parseInt(rev.rating);
+                                let stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+                                reviewsHTML += `
+                                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-sm text-main">${rev.user_name}</span>
+                                            <span class="text-xs text-amber-500 font-semibold">${stars}</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 leading-relaxed">${rev.comment}</p>
+                                        <span class="text-[10px] text-gray-400 block mt-2">${rev.created_at}</span>
+                                    </div>
+                                `;
+                            });
+                            reviewsList.innerHTML = reviewsHTML;
+
+                            const avgRating = (totalRating / reviews.length).toFixed(1);
+                            document.getElementById('detail_avg_rating').innerText = avgRating;
+                            document.getElementById('detail_review_count').innerText = `(${reviews.length} ulasan)`;
+                        }
+
+                        // Footer Action (Tambah ke Keranjang)
+                        const footerAction = document.getElementById('detail_footer_action');
+                        if (parseInt(book.stock) > 0) {
+                            footerAction.innerHTML = `
+                                <button onclick="closeDetailModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold transition-colors">Tutup</button>
+                                <a href="/perpus-online/public/cart/add?id=${book.id}" class="bg-primary hover:bg-opacity-95 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-primary/20 flex items-center gap-2">🛒 Pinjam Buku</a>
+                            `;
+                        } else {
+                            footerAction.innerHTML = `
+                                <button onclick="closeDetailModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold transition-colors">Tutup</button>
+                                <button disabled class="bg-gray-100 text-gray-400 px-6 py-2.5 rounded-xl font-bold text-sm cursor-not-allowed">Stok Habis</button>
+                            `;
+                        }
+
+                        // Open modal
+                        dModal.classList.remove('hidden');
+                        dModal.classList.add('flex');
+                        setTimeout(() => {
+                            dContent.classList.remove('scale-95');
+                            dContent.classList.add('scale-100');
+                        }, 50);
+                    }
+                });
+        }
+
+        function closeDetailModal() {
+            dContent.classList.remove('scale-100');
+            dContent.classList.add('scale-95');
+            setTimeout(() => {
+                dModal.classList.remove('flex');
+                dModal.classList.add('hidden');
+            }, 150);
+        }
+    </script>
 
 </body>
 </html>

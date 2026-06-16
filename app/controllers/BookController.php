@@ -118,4 +118,45 @@ class BookController {
         header("Location: /perpus-online/public/admin/books?status=success");
         exit();
     }
+
+    // AJAX: Mendapatkan detail buku beserta ulasan-ulasannya
+    public function detail() {
+        $book_id = $_GET['id'] ?? null;
+        if ($book_id) {
+            $book = $this->bookModel->getBookById($book_id);
+            if ($book) {
+                // Get category name
+                $categories = $this->bookModel->getCategories();
+                $category_name = 'Umum';
+                foreach ($categories as $cat) {
+                    if ($cat['id'] == $book['category_id']) {
+                        $category_name = $cat['name'];
+                        break;
+                    }
+                }
+                $book['category_name'] = $category_name;
+
+                // Get reviews
+                $db = new Database();
+                $db->query("SELECT reviews.*, users.name as user_name FROM reviews 
+                            JOIN users ON reviews.user_id = users.id 
+                            WHERE reviews.book_id = :book_id ORDER BY reviews.created_at DESC");
+                $db->bind(':book_id', $book_id);
+                $reviews = $db->resultSet();
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'book' => $book,
+                    'reviews' => $reviews
+                ]);
+                exit();
+            }
+        }
+        
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Invalid Request']);
+        exit();
+    }
 }

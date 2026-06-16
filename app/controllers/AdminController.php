@@ -18,8 +18,12 @@ class AdminController {
         $totalBooks = $this->bookModel->getTotalBooks();
         $totalMembers = $this->userModel->getTotalMembers();
         
-        // Untuk buku terlambat, kita set 0 dulu sampai modul Peminjaman (Loan) dibuat
-        $totalLate = 0; 
+        // Hitung buku terlambat (status 'late' atau status 'approved' yang sudah melewati jatuh tempo)
+        $db = new Database();
+        $db->query("SELECT COUNT(*) as total FROM loans 
+                    WHERE status = 'late' OR (status = 'approved' AND due_date < CURRENT_DATE())");
+        $result = $db->single();
+        $totalLate = $result['total']; 
 
         // Panggil view
         require_once '../app/views/admin/dashboard.php';

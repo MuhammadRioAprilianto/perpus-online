@@ -16,23 +16,26 @@
     
     <div class="min-h-screen flex flex-col md:flex-row">
         
-        <aside class="w-full md:w-64 bg-white shadow-sm border-r border-gray-100 flex flex-col">
-            <div class="p-6 font-bold text-2xl text-primary border-b border-gray-100">
+        <aside class="w-full md:w-64 bg-white shadow-sm border-r border-gray-100 min-h-screen p-6">
+            <div class="font-bold text-2xl text-primary mb-8">
                 Perpus<span class="text-accent">Online</span>
             </div>
-            <nav class="p-4 space-y-2 flex-1">
-                <a href="/perpus-online/public/admin/dashboard" class="block p-3 rounded-xl bg-primary text-white shadow-md shadow-primary/30 font-medium transition-all">
-                    Dashboard
+            <nav class="space-y-2">
+                <a href="/perpus-online/public/admin/dashboard" 
+                class="block p-3 rounded-xl transition-all <?= (strpos($_SERVER['REQUEST_URI'], 'dashboard') !== false) ? 'bg-primary text-white shadow-md shadow-primary/30' : 'text-gray-500 hover:bg-base' ?>">
+                Dashboard
                 </a>
-                <a href="/perpus-online/public/admin/books" class="block p-3 rounded-xl hover:bg-base hover:text-primary transition-all duration-300 text-gray-500 font-medium">
-                    Manajemen Buku
+                <a href="/perpus-online/public/admin/books" 
+                class="block p-3 rounded-xl transition-all <?= (strpos($_SERVER['REQUEST_URI'], 'books') !== false) ? 'bg-primary text-white shadow-md shadow-primary/30' : 'text-gray-500 hover:bg-base' ?>">
+                Manajemen Buku
                 </a>
-                <a href="/perpus-online/public/admin/loans" class="block p-3 rounded-xl hover:bg-base hover:text-primary transition-all duration-300 text-gray-500 font-medium">
-                    Peminjaman
+                <a href="/perpus-online/public/admin/loans" 
+                class="block p-3 rounded-xl transition-all <?= (strpos($_SERVER['REQUEST_URI'], 'loans') !== false) ? 'bg-primary text-white shadow-md shadow-primary/30' : 'text-gray-500 hover:bg-base' ?>">
+                Peminjaman
                 </a>
             </nav>
-            <div class="p-4 border-t border-gray-100">
-                <a href="/perpus-online/public/logout" class="block text-center p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium">
+            <div class="mt-auto pt-8 border-t border-gray-100">
+                <a href="/perpus-online/public/logout" class="block p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium">
                     Logout
                 </a>
             </div>
