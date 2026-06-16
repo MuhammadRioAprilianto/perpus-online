@@ -3,7 +3,8 @@
 
 $routes = [
     // --- Public / User Routes ---
-    '' => ['HomeController', 'index'],                  // Halaman utama (Katalog Buku)
+    '' => ['HomeController', 'index'],                  // Halaman utama (Landing Page)
+    'catalog' => ['HomeController', 'catalog'],          // Katalog Buku
     'login' => ['AuthController', 'login'],             // Halaman Login User & Admin
     'register' => ['AuthController', 'register'],       // Halaman Register User
     'logout' => ['AuthController', 'logout'],           // Proses Logout
@@ -16,6 +17,9 @@ $routes = [
     
     // --- Admin Routes ---
     'admin/dashboard' => ['AdminController', 'index'],
+    'admin/members' => ['AdminController', 'members'],
+    'admin/reviews' => ['AdminController', 'reviews'],
+    'admin/reviews/delete' => ['AdminController', 'deleteReview'],
     
     // Manajemen Buku (Admin)
     'admin/books' => ['BookController', 'index'],

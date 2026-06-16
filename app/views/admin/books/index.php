@@ -76,6 +76,16 @@
                     <?= renderIcon('clipboard', 'w-5 h-5') ?>
                     <span>Validasi Peminjaman</span>
                 </a>
+                <a href="<?= BASE_URL ?>/admin/members" 
+                   class="flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all duration-300 <?= (strpos($_SERVER['REQUEST_URI'], 'members') !== false) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white' ?>">
+                    <?= renderIcon('users', 'w-5 h-5') ?>
+                    <span>Daftar Member</span>
+                </a>
+                <a href="<?= BASE_URL ?>/admin/reviews" 
+                   class="flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all duration-300 <?= (strpos($_SERVER['REQUEST_URI'], 'reviews') !== false) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white' ?>">
+                    <?= renderIcon('star', 'w-5 h-5') ?>
+                    <span>Ulasan Buku</span>
+                </a>
             </nav>
             
             <div class="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-4">

@@ -48,19 +48,57 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="<?= BASE_URL ?>/" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Katalog</a>
+                    <a href="<?= BASE_URL ?>/" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Beranda</a>
+                    <a href="<?= BASE_URL ?>/catalog" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Katalog</a>
                     
-                    <?php if(isset($_SESSION['user_id'])): ?>
-                        <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                            <a href="<?= BASE_URL ?>/admin/dashboard" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Dashboard Admin</a>
-                        <?php else: ?>
-                            <a href="<?= BASE_URL ?>/loans" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Pinjamanku</a>
-                            <a href="<?= BASE_URL ?>/cart" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Keranjang</a>
-                        <?php endif; ?>
-                        <a href="<?= BASE_URL ?>/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition font-bold text-sm shadow-sm">Keluar</a>
-                    <?php else: ?>
+                    <?php if(!isset($_SESSION['user_id'])): ?>
                         <a href="<?= BASE_URL ?>/login" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold transition">Masuk</a>
                         <a href="<?= BASE_URL ?>/register" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition font-bold text-sm shadow-sm">Daftar</a>
+                    <?php else: ?>
+                        <!-- Profile Dropdown -->
+                        <div class="relative inline-block text-left shadow-none" id="user-menu-wrapper">
+                            <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-750 transition-all font-bold text-xs text-slate-700 dark:text-slate-200 focus:outline-none">
+                                <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black uppercase tracking-wider select-none">
+                                    <?= substr($_SESSION['user_name'], 0, 1) ?>
+                                </div>
+                                <span class="max-w-[100px] truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" id="user-menu-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown-menu" class="origin-top-right absolute right-0 mt-2.5 w-52 rounded-2xl shadow-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 py-2 z-50 hidden transition-all duration-200 scale-95 opacity-0 transform">
+                                <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-700/60 mb-1.5">
+                                    <p class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Masuk sebagai</p>
+                                    <p class="font-bold text-slate-800 dark:text-slate-200 text-xs truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></p>
+                                    <span class="inline-block bg-primary/10 text-primary dark:text-indigo-400 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md mt-1"><?= $_SESSION['user_role'] == 'admin' ? 'Pustakawan' : 'Member' ?></span>
+                                </div>
+
+                                <?php if($_SESSION['user_role'] == 'admin'): ?>
+                                    <a href="<?= BASE_URL ?>/admin/dashboard" class="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-750 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                        <?= renderIcon('dashboard', 'w-3.5 h-3.5') ?>
+                                        <span>Dashboard Admin</span>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?= BASE_URL ?>/loans" class="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-750 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                        <?= renderIcon('clipboard', 'w-3.5 h-3.5') ?>
+                                        <span>Pinjamanku</span>
+                                    </a>
+                                    <a href="<?= BASE_URL ?>/cart" class="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-750 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                        <?= renderIcon('cart', 'w-3.5 h-3.5') ?>
+                                        <span>Keranjang</span>
+                                    </a>
+                                <?php endif; ?>
+                                
+                                <div class="border-t border-slate-100 dark:border-slate-700/60 my-1.5"></div>
+                                
+                                <a href="<?= BASE_URL ?>/logout" class="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+                                    <?= renderIcon('logout', 'w-3.5 h-3.5 text-red-500') ?>
+                                    <span>Keluar</span>
+                                </a>
+                            </div>
+                        </div>
                     <?php endif; ?>
 
                     <!-- Dark Mode Toggle -->
@@ -126,8 +164,48 @@
             }, 150);
         }
 
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown-menu');
+            const chevron = document.getElementById('user-menu-chevron');
+            if (dropdown) {
+                const isHidden = dropdown.classList.contains('hidden');
+                if (isHidden) {
+                    dropdown.classList.remove('hidden');
+                    setTimeout(() => {
+                        dropdown.classList.remove('scale-95', 'opacity-0');
+                        dropdown.classList.add('scale-100', 'opacity-100');
+                    }, 20);
+                    if (chevron) chevron.classList.add('rotate-180');
+                } else {
+                    dropdown.classList.remove('scale-100', 'opacity-100');
+                    dropdown.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        dropdown.classList.add('hidden');
+                    }, 150);
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcons();
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('user-menu-wrapper');
+                const dropdown = document.getElementById('user-dropdown-menu');
+                const chevron = document.getElementById('user-menu-chevron');
+                if (wrapper && !wrapper.contains(e.target)) {
+                    if (dropdown && !dropdown.classList.contains('hidden')) {
+                        dropdown.classList.remove('scale-100', 'opacity-100');
+                        dropdown.classList.add('scale-95', 'opacity-0');
+                        setTimeout(() => {
+                            dropdown.classList.add('hidden');
+                        }, 150);
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    }
+                }
+            });
         });
     </script>
 </body>

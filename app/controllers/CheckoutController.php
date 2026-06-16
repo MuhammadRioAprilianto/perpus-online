@@ -10,8 +10,7 @@ class CheckoutController {
     public function index() {
         // Keamanan: Hanya member yang boleh akses
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         // Tangkap data dari form keranjang (via POST)
@@ -23,8 +22,7 @@ class CheckoutController {
             require_once '../app/views/checkout/index.php';
         } else {
             // Jika ada yang mencoba akses URL /checkout langsung tanpa lewat keranjang, tendang kembali
-            header("Location: /perpus-online/public/cart");
-            exit();
+            redirect('/cart');
         }
     }
 }

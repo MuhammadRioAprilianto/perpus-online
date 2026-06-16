@@ -15,7 +15,7 @@
             <div>
                 <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4">Navigasi</h4>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="<?= BASE_URL ?>/" class="text-slate-400 hover:text-white transition-colors">Katalog Buku</a></li>
+                    <li><a href="<?= BASE_URL ?>/catalog" class="text-slate-400 hover:text-white transition-colors">Katalog Buku</a></li>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                             <li><a href="<?= BASE_URL ?>/admin/dashboard" class="text-slate-400 hover:text-white transition-colors">Dashboard Admin</a></li>

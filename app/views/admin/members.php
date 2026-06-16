@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Perpus Online</title>
+    <title>Daftar Member - Admin Perpustakaan</title>
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -49,7 +49,7 @@
             <div class="font-extrabold text-2xl text-primary dark:text-indigo-400 mb-10 tracking-tight flex items-center justify-between">
                 <span>Perpus<span class="text-accent">Online</span></span>
                 
-                <!-- Theme Toggle Button -->
+                <!-- Theme Toggle Button Mobile -->
                 <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors md:hidden" title="Ubah Tema">
                     <svg id="theme-icon-sun-mob" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
@@ -102,70 +102,92 @@
                     </span>
                 </button>
 
-                <a href="<?= BASE_URL ?>/logout" class="flex items-center gap-3 p-3.5 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all font-bold text-sm">
+                <a href="<?= BASE_URL ?>/logout" class="flex items-center gap-3 p-3.5 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-bold text-sm">
                     <?= renderIcon('logout', 'w-5 h-5 text-red-500') ?>
                     <span>Keluar</span>
                 </a>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content Container -->
         <div class="flex-grow flex flex-col min-h-screen">
             <main class="flex-grow p-6 md:p-12">
                 
-                <div class="mb-10">
-                    <span class="bg-primary/10 text-primary dark:text-indigo-400 text-xs font-bold px-3.5 py-1.5 rounded-xl uppercase tracking-wider mb-2.5 inline-block">
-                        Pustakawan Panel
-                    </span>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Selamat Datang, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?>!</h1>
-                    <p class="text-slate-400 dark:text-slate-400 mt-1.5 text-sm font-medium">Monitor aktivitas transaksi peminjaman dan pengelolaan inventaris buku.</p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+                    <div>
+                        <span class="bg-primary/10 text-primary dark:text-indigo-400 text-xs font-bold px-3.5 py-1.5 rounded-xl uppercase tracking-wider mb-2.5 inline-block">
+                            Manajemen Akun
+                        </span>
+                        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Daftar Member Terdaftar</h1>
+                        <p class="text-slate-400 dark:text-slate-400 text-sm mt-1.5">Pantau data member, jumlah aktivitas peminjaman buku, dan status denda.</p>
+                    </div>
                 </div>
 
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-                    
-                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-5 transition-all hover:shadow-md hover:border-slate-200/55 duration-300">
-                        <div class="w-14 h-14 bg-indigo-50 dark:bg-slate-800 text-primary dark:text-indigo-400 rounded-2xl flex items-center justify-center">
-                            <?= renderIcon('tag', 'w-7 h-7') ?>
-                        </div>
-                        <div>
-                            <p class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Total Koleksi Buku</p>
-                            <h3 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-1"><?= htmlspecialchars($totalBooks) ?></h3>
-                        </div>
-                    </div>
+                <!-- Table Card -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+                                    <th class="p-5 font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Nama & Email</th>
+                                    <th class="p-5 font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Bergabung Pada</th>
+                                    <th class="p-5 font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider text-center">Buku Pernah Dipinjam</th>
+                                    <th class="p-5 font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider text-center">Sedang Dipinjam (Aktif)</th>
+                                    <th class="p-5 font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider text-center">Denda Akumulasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                
+                                <?php if(empty($members)): ?>
+                                    <tr>
+                                        <td colspan="5" class="p-16 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <div class="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4 flex items-center justify-center">
+                                                    <?= renderIcon('users', 'w-12 h-12') ?>
+                                                </div>
+                                                <p>Belum ada member terdaftar.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach($members as $member): ?>
+                                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors duration-200">
+                                        <td class="p-5">
+                                            <p class="font-bold text-slate-800 dark:text-slate-200 text-base leading-snug"><?= htmlspecialchars($member['name']) ?></p>
+                                            <p class="text-xs text-slate-400 dark:text-slate-400 mt-1"><?= htmlspecialchars($member['email']) ?></p>
+                                        </td>
+                                        <td class="p-5">
+                                            <span class="text-sm text-slate-600 dark:text-slate-300 font-medium">
+                                                <?= date('d M Y', strtotime($member['created_at'])) ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-5 text-center font-semibold text-slate-800 dark:text-slate-200">
+                                            <?= htmlspecialchars($member['total_loans']) ?>
+                                        </td>
+                                        <td class="p-5 text-center">
+                                            <?php if($member['active_loans'] > 0): ?>
+                                                <span class="bg-indigo-50 dark:bg-indigo-950/30 text-primary dark:text-indigo-400 px-3 py-1.5 rounded-xl text-xs font-bold border border-indigo-100/50 dark:border-indigo-900/40">
+                                                    <?= htmlspecialchars($member['active_loans']) ?> Buku
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-slate-400 dark:text-slate-600 text-xs font-semibold">Tidak Ada</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-5 text-center">
+                                            <?php if($member['total_fines'] > 0): ?>
+                                                <span class="bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 px-3 py-1.5 rounded-xl text-xs font-black border border-rose-100/50 dark:border-rose-900/40">
+                                                    <?= formatCurrency($member['total_fines']) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-emerald-600 dark:text-emerald-400 text-xs font-bold">Rp 0 (Lunas)</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
 
-                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-5 transition-all hover:shadow-md hover:border-slate-200/55 duration-300">
-                        <div class="w-14 h-14 bg-amber-50 dark:bg-slate-800 text-accent rounded-2xl flex items-center justify-center">
-                            <?= renderIcon('users', 'w-7 h-7') ?>
-                        </div>
-                        <div>
-                            <p class="text-slate-500 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Total Akun Member</p>
-                            <h3 class="text-3xl font-extrabold text-slate-800 dark:text-white mt-1"><?= htmlspecialchars($totalMembers) ?></h3>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-5 transition-all hover:shadow-md hover:border-slate-200/55 duration-300">
-                        <div class="w-14 h-14 bg-rose-50 dark:bg-slate-800 text-rose-500 rounded-2xl flex items-center justify-center">
-                            <?= renderIcon('clock', 'w-7 h-7') ?>
-                        </div>
-                        <div>
-                            <p class="text-slate-500 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Buku Terlambat</p>
-                            <h3 class="text-3xl font-extrabold text-rose-600 dark:text-rose-400 mt-1"><?= htmlspecialchars($totalLate) ?></h3>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 transition-colors">
-                    <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-5">Pintasan Manajemen</h2>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="<?= BASE_URL ?>/admin/books/add" class="bg-primary hover:bg-opacity-95 text-white px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-0.5 text-sm flex items-center gap-2">
-                            <span>+ Tambah Koleksi Buku</span>
-                        </a>
-                        <a href="<?= BASE_URL ?>/admin/loans" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-0.5 text-sm">
-                            Kelola Persetujuan Peminjaman
-                        </a>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

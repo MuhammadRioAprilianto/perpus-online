@@ -16,8 +16,7 @@ class CartController {
     public function index() {
         // Hanya member yang boleh akses
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $userId = $_SESSION['user_id'];
@@ -29,8 +28,7 @@ class CartController {
     // Memproses penambahan buku ke keranjang
     public function add() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $userId = $_SESSION['user_id'];
@@ -40,31 +38,27 @@ class CartController {
             // 1. Cek apakah keranjang sudah penuh (Maks 3)
             $totalInCart = $this->cartModel->countUserCart($userId);
             if ($totalInCart >= 3) {
-                header("Location: /perpus-online/public/?status=cart_full");
-                exit();
+                redirect('/catalog?status=cart_full');
             }
 
             // 2. Cek apakah buku sudah ada di keranjang
             if ($this->cartModel->isBookInCart($userId, $bookId)) {
-                header("Location: /perpus-online/public/?status=already_in_cart");
-                exit();
+                redirect('/catalog?status=already_in_cart');
             }
 
             // 3. Tambahkan ke keranjang
             $this->cartModel->addToCart($userId, $bookId);
             // Kembalikan ke halaman utama (katalog) agar user bisa lanjut milih buku
-            header("Location: /perpus-online/public/?status=added_to_cart");
-            exit();
+            redirect('/catalog?status=added_to_cart');
         }
 
-        header("Location: /perpus-online/public/");
+        redirect('/catalog');
     }
 
     // Menghapus buku dari keranjang
     public function remove() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $cartId = $_GET['id'] ?? null;
@@ -74,8 +68,7 @@ class CartController {
             $this->cartModel->removeFromCart($cartId, $userId);
         }
 
-        header("Location: /perpus-online/public/cart?status=removed");
-        exit();
+        redirect('/cart?status=removed');
     }
 
 }

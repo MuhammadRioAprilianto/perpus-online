@@ -48,6 +48,12 @@
 
     <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700/50 p-8 md:p-10 my-8 relative transition-colors">
         
+        <div class="mb-5">
+            <a href="<?= BASE_URL ?>/" class="text-slate-400 dark:text-slate-400 hover:text-primary dark:hover:text-indigo-400 font-semibold transition-colors text-xs flex items-center gap-1.5 w-max">
+                &larr; Kembali ke Beranda
+            </a>
+        </div>
+
         <div class="text-center mb-8">
             <h1 class="text-3xl font-extrabold text-primary dark:text-indigo-400 mb-2 tracking-tight">Perpus<span class="text-accent">Online</span></h1>
             <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Pendaftaran Member</h2>

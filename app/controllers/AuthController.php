@@ -39,8 +39,7 @@ class AuthController {
                 $this->redirectBasedOnRole();
             } else {
                 // Jika gagal, kembalikan ke halaman login dengan pesan error
-                header("Location: /perpus-online/public/login?status=error");
-                exit();
+                redirect('/login?status=error');
             }
         } else {
             // Tampilkan view form login
@@ -62,23 +61,20 @@ class AuthController {
 
             // Validasi password match
             if ($password !== $confirm_password) {
-                header("Location: /perpus-online/public/register?status=password_mismatch");
-                exit();
+                redirect('/register?status=password_mismatch');
             }
 
             // Cek apakah email sudah terdaftar
             if ($this->userModel->findByEmail($email)) {
-                header("Location: /perpus-online/public/register?status=email_exists");
-                exit();
+                redirect('/register?status=email_exists');
             }
 
             // Eksekusi registrasi
             if ($this->userModel->register($name, $email, $password)) {
-                header("Location: /perpus-online/public/login?status=registered");
+                redirect('/login?status=registered');
             } else {
-                header("Location: /perpus-online/public/register?status=error");
+                redirect('/register?status=error');
             }
-            exit();
         } else {
             // Tampilkan view form register
             require_once '../app/views/auth/register.php';
@@ -96,17 +92,15 @@ class AuthController {
         session_destroy();
         
         // Redirect ke halaman utama / login
-        header("Location: /perpus-online/public/login");
-        exit();
+        redirect('/login');
     }
 
     // Fungsi helper untuk routing otomatis berdasarkan role
     private function redirectBasedOnRole() {
         if ($_SESSION['user_role'] == 'admin') {
-            header("Location: /perpus-online/public/admin/dashboard");
+            redirect('/admin/dashboard');
         } else {
-            header("Location: /perpus-online/public/");
+            redirect('/catalog');
         }
-        exit();
     }
 }

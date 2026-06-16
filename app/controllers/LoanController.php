@@ -57,16 +57,14 @@ class LoanController {
             $this->db->bind(':user_id', $user_id);
             $this->db->execute();
 
-            header("Location: /perpus-online/public/?status=loan_success");
-            exit();
+            redirect('/catalog?status=loan_success');
         }
     }
 
     // Admin: Melihat daftar semua peminjaman
     public function index() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $this->db->query("SELECT loans.*, users.name as user_name FROM loans 
@@ -89,8 +87,7 @@ class LoanController {
     // Admin: Mengubah status peminjaman (approve/reject)
     public function approve() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $loan_id = $_GET['id'] ?? null;
@@ -114,8 +111,7 @@ class LoanController {
                 }
 
                 if (!$can_approve) {
-                    header("Location: /perpus-online/public/admin/loans?status=out_of_stock");
-                    exit();
+                    redirect('/admin/loans?status=out_of_stock');
                 }
 
                 // Kurangi stok masing-masing buku sebanyak 1
@@ -132,15 +128,13 @@ class LoanController {
             $this->db->execute();
         }
         
-        header("Location: /perpus-online/public/admin/loans?status=success");
-        exit();
+        redirect('/admin/loans?status=success');
     }
 
     // Admin: Konfirmasi pengembalian buku & kalkulasi denda otomatis
     public function returnBook() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $loan_id = $_GET['id'] ?? null;
@@ -188,15 +182,13 @@ class LoanController {
             }
         }
 
-        header("Location: /perpus-online/public/admin/loans?status=success");
-        exit();
+        redirect('/admin/loans?status=success');
     }
 
     // User: Melihat riwayat peminjaman sendiri
     public function myLoans() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-            header("Location: /perpus-online/public/login");
-            exit();
+            redirect('/login');
         }
 
         $user_id = $_SESSION['user_id'];
@@ -228,8 +220,7 @@ class LoanController {
     public function addReview() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'member') {
-                header("Location: /perpus-online/public/login");
-                exit();
+                redirect('/login');
             }
 
             $user_id = $_SESSION['user_id'];
@@ -254,8 +245,7 @@ class LoanController {
                 }
             }
 
-            header("Location: /perpus-online/public/loans?status=review_success");
-            exit();
+            redirect('/loans?status=review_success');
         }
     }
 }

@@ -46,11 +46,10 @@ class BookController {
             ];
 
             if ($this->bookModel->addBook($data)) {
-                header("Location: /perpus-online/public/admin/books?status=success");
+                redirect('/admin/books?status=success');
             } else {
-                header("Location: /perpus-online/public/admin/books?status=error");
+                redirect('/admin/books?status=error');
             }
-            exit();
         } else {
             // Jika diakses lewat GET, tampilkan form tambah buku
             $categories = $this->bookModel->getCategories();
@@ -64,8 +63,7 @@ class BookController {
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
-            header("Location: /perpus-online/public/admin/books");
-            exit();
+            redirect('/admin/books');
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -94,11 +92,10 @@ class BookController {
             ];
 
             if ($this->bookModel->updateBook($data)) {
-                header("Location: /perpus-online/public/admin/books?status=success");
+                redirect('/admin/books?status=success');
             } else {
-                header("Location: /perpus-online/public/admin/books?status=error");
+                redirect('/admin/books?status=error');
             }
-            exit();
         } else {
             // Jika diakses lewat GET, ambil data buku yang akan diedit
             $book = $this->bookModel->getBookById($id);
@@ -115,8 +112,7 @@ class BookController {
         if ($id) {
             $this->bookModel->deleteBook($id);
         }
-        header("Location: /perpus-online/public/admin/books?status=success");
-        exit();
+        redirect('/admin/books?status=success');
     }
 
     // AJAX: Mendapatkan detail buku beserta ulasan-ulasannya

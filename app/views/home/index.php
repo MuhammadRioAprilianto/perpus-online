@@ -52,6 +52,57 @@
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-10px) scale(1.05); }
         }
+        
+        /* Custom Alert Styles for High Visibility */
+        .alert-success {
+            background-color: #f0fdf4 !important;
+            color: #15803d !important;
+            border-color: #bbf7d0 !important;
+        }
+        .alert-success span:not(.text-emerald-500) {
+            color: #15803d !important;
+        }
+        .dark .alert-success {
+            background-color: rgba(6, 78, 59, 0.2) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(6, 78, 59, 0.5) !important;
+        }
+        .dark .alert-success span:not(.text-emerald-500) {
+            color: #6ee7b7 !important;
+        }
+        
+        .alert-rose {
+            background-color: #fff1f2 !important;
+            color: #b91c1c !important;
+            border-color: #fecdd3 !important;
+        }
+        .dark .alert-rose {
+            background-color: rgba(159, 18, 57, 0.2) !important;
+            color: #fda4af !important;
+            border-color: rgba(159, 18, 57, 0.5) !important;
+        }
+        
+        .alert-amber {
+            background-color: #fffbeb !important;
+            color: #b45309 !important;
+            border-color: #fde68a !important;
+        }
+        .dark .alert-amber {
+            background-color: rgba(120, 53, 4, 0.2) !important;
+            color: #fcd34d !important;
+            border-color: rgba(120, 53, 4, 0.5) !important;
+        }
+        
+        .alert-blue {
+            background-color: #eff6ff !important;
+            color: #1d4ed8 !important;
+            border-color: #bfdbfe !important;
+        }
+        .dark .alert-blue {
+            background-color: rgba(30, 58, 138, 0.2) !important;
+            color: #93c5fd !important;
+            border-color: rgba(30, 58, 138, 0.5) !important;
+        }
     </style>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -74,26 +125,56 @@
             </a>
             
             <div class="flex items-center gap-5">
+                <a href="<?= BASE_URL ?>/" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-bold transition-colors text-sm">Beranda</a>
+                <a href="<?= BASE_URL ?>/catalog" class="text-primary dark:text-indigo-400 font-bold transition-colors text-sm border-b-2 border-primary dark:border-indigo-400 pb-1">Katalog Buku</a>
                 <?php if(!isset($_SESSION['user_id'])): ?>
                     <a href="<?= BASE_URL ?>/login" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-semibold transition-colors text-sm">Masuk</a>
                     <a href="<?= BASE_URL ?>/register" class="bg-primary hover:bg-opacity-95 hover:shadow-lg hover:shadow-primary/20 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-0.5 text-sm">Daftar</a>
                 <?php else: ?>
-                    <span class="text-sm text-slate-500 dark:text-slate-400 font-medium hidden md:block">Halo, <span class="text-slate-800 dark:text-slate-200 font-bold"><?= htmlspecialchars($_SESSION['user_name']) ?></span></span>
-                    
-                    <?php if($_SESSION['user_role'] == 'admin'): ?>
-                        <a href="<?= BASE_URL ?>/admin/dashboard" class="bg-accent hover:bg-opacity-95 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:-translate-y-0.5 text-sm">Dashboard Admin</a>
-                    <?php else: ?>
-                        <a href="<?= BASE_URL ?>/loans" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-bold transition-colors flex items-center gap-2 text-sm">
-                            <?= renderIcon('clipboard', 'w-4 h-4') ?>
-                            <span>Pinjamanku</span>
-                        </a>
-                        <a href="<?= BASE_URL ?>/cart" class="bg-slate-100 hover:bg-primary dark:bg-slate-800 dark:hover:bg-primary hover:text-white text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2 text-sm relative">
-                            <?= renderIcon('cart', 'w-4 h-4') ?>
-                            <span>Keranjang</span>
-                        </a>
-                    <?php endif; ?>
-                    
-                    <a href="<?= BASE_URL ?>/logout" class="text-red-500 hover:text-red-700 font-bold transition-colors text-sm">Keluar</a>
+                    <!-- Profile Dropdown -->
+                    <div class="relative inline-block text-left" id="user-menu-wrapper">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-750 transition-all font-bold text-sm text-slate-700 dark:text-slate-200 focus:outline-none">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black uppercase tracking-wider select-none">
+                                <?= substr($_SESSION['user_name'], 0, 1) ?>
+                            </div>
+                            <span class="max-w-[120px] truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform duration-200" id="user-menu-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="user-dropdown-menu" class="origin-top-right absolute right-0 mt-3.5 w-56 rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 py-2.5 z-50 hidden transition-all duration-200 scale-95 opacity-0 transform">
+                            <div class="px-5 py-2.5 border-b border-slate-100 dark:border-slate-700/60 mb-2">
+                                <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Masuk sebagai</p>
+                                <p class="font-bold text-slate-800 dark:text-slate-200 text-sm truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></p>
+                                <span class="inline-block bg-primary/10 text-primary dark:text-indigo-400 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md mt-1.5"><?= $_SESSION['user_role'] == 'admin' ? 'Pustakawan' : 'Member' ?></span>
+                            </div>
+
+                            <?php if($_SESSION['user_role'] == 'admin'): ?>
+                                <a href="<?= BASE_URL ?>/admin/dashboard" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('dashboard', 'w-4 h-4') ?>
+                                    <span>Dashboard Admin</span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= BASE_URL ?>/loans" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('clipboard', 'w-4 h-4') ?>
+                                    <span>Pinjamanku</span>
+                                </a>
+                                <a href="<?= BASE_URL ?>/cart" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('cart', 'w-4 h-4') ?>
+                                    <span>Keranjang</span>
+                                </a>
+                            <?php endif; ?>
+                            
+                            <div class="border-t border-slate-100 dark:border-slate-700/60 my-2"></div>
+                            
+                            <a href="<?= BASE_URL ?>/logout" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+                                <?= renderIcon('logout', 'w-4 h-4 text-red-500') ?>
+                                <span>Keluar</span>
+                            </a>
+                        </div>
+                    </div>
                 <?php endif; ?>
 
                 <!-- Theme Toggle Button -->
@@ -138,19 +219,19 @@
         <!-- Alerts / Status -->
         <?php if(isset($_GET['status'])): ?>
             <?php if($_GET['status'] == 'added_to_cart'): ?>
-                <div class="mb-8 p-5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-950 dark:text-emerald-300 rounded-3xl border border-emerald-200 dark:border-emerald-900/50 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
-                    <span class="font-extrabold flex items-center gap-3 text-sm sm:text-base">
+                <div class="mb-8 p-5 alert-success rounded-3xl border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
+                    <div class="font-extrabold flex items-center gap-3 text-sm sm:text-base">
                         <span class="w-6 h-6 flex-shrink-0 text-emerald-500">
                             <?= renderIcon('check-circle', 'w-6 h-6') ?>
                         </span> 
                         <span>Buku berhasil ditambahkan ke keranjang peminjaman Anda!</span>
-                    </span>
+                    </div>
                     <a href="<?= BASE_URL ?>/cart" class="bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white px-6 py-2.5 rounded-2xl font-black transition-colors text-sm shadow-md">
                         Buka Keranjang &rarr;
                     </a>
                 </div>
             <?php elseif($_GET['status'] == 'cart_full'): ?>
-                <div class="mb-8 p-5 bg-rose-50 dark:bg-rose-950/20 text-rose-950 dark:text-rose-300 rounded-3xl border border-rose-200 dark:border-rose-900/50 shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
+                <div class="mb-8 p-5 alert-rose rounded-3xl border shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
                     <span class="w-6 h-6 flex-shrink-0 text-rose-500">
                         <?= renderIcon('warning', 'w-6 h-6') ?>
                     </span> 
@@ -158,21 +239,21 @@
                     <span class="font-bold">Maksimal buku yang dipinjam bersamaan adalah 3 buah.</span>
                 </div>
             <?php elseif($_GET['status'] == 'already_in_cart'): ?>
-                <div class="mb-8 p-5 bg-amber-50 dark:bg-amber-950/20 text-amber-950 dark:text-amber-300 rounded-3xl border border-amber-200 dark:border-amber-900/50 shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
+                <div class="mb-8 p-5 alert-amber rounded-3xl border shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
                     <span class="w-6 h-6 flex-shrink-0 text-amber-500">
                         <?= renderIcon('info', 'w-6 h-6') ?>
                     </span> 
                     <span class="font-bold">Buku tersebut sudah terdaftar di keranjang Anda.</span>
                 </div>
             <?php elseif($_GET['status'] == 'loan_success'): ?>
-                <div class="mb-8 p-5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-950 dark:text-emerald-300 rounded-3xl border border-emerald-200 dark:border-emerald-900/50 shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
+                <div class="mb-8 p-5 alert-success rounded-3xl border shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
                     <span class="w-6 h-6 flex-shrink-0 text-emerald-500">
                         <?= renderIcon('check-circle', 'w-6 h-6') ?>
                     </span> 
                     <span class="font-bold">Peminjaman sukses diajukan! Silakan ambil buku Anda sesuai tanggal pengambilan.</span>
                 </div>
             <?php elseif($_GET['status'] == 'removed'): ?>
-                <div class="mb-8 p-5 bg-blue-50 dark:bg-blue-950/20 text-blue-950 dark:text-blue-300 rounded-3xl border border-blue-200 dark:border-blue-900/50 shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
+                <div class="mb-8 p-5 alert-blue rounded-3xl border shadow-sm flex items-center gap-3 animate-fade-in text-sm sm:text-base">
                     <span class="w-6 h-6 flex-shrink-0 text-blue-500">
                         <?= renderIcon('trash', 'w-6 h-6') ?>
                     </span> 
@@ -182,7 +263,7 @@
         <?php endif; ?>
 
         <!-- Search and Filter Panel -->
-        <form method="GET" action="<?= BASE_URL ?>/" class="mb-12 bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700/50 flex flex-col md:flex-row gap-4 items-center transition-colors">
+        <form method="GET" action="<?= BASE_URL ?>/catalog" class="mb-12 bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700/50 flex flex-col md:flex-row gap-4 items-center transition-colors">
             
             <div class="flex-1 w-full relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
@@ -210,7 +291,7 @@
                 </button>
                 
                 <?php if(!empty($_GET['search']) || !empty($_GET['category'])): ?>
-                    <a href="<?= BASE_URL ?>/" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-semibold transition-all text-sm text-center">
+                    <a href="<?= BASE_URL ?>/catalog" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-semibold transition-all text-sm text-center">
                         Reset
                     </a>
                 <?php endif; ?>
@@ -234,6 +315,24 @@
                 </div>
                 Buku yang Anda cari tidak ditemukan atau belum tersedia.
             </div>
+
+            <!-- Skeleton Loading Cards -->
+            <?php for ($i = 0; $i < 4; $i++): ?>
+            <div class="skeleton-card bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700/50 overflow-hidden flex flex-col animate-pulse hidden" style="transition: opacity 0.3s ease;">
+                <div class="bg-slate-200 dark:bg-slate-700 aspect-[3/4] w-full"></div>
+                <div class="p-6 space-y-3 flex-grow flex flex-col justify-between">
+                    <div class="space-y-2.5">
+                        <div class="h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full w-1/4"></div>
+                        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4"></div>
+                        <div class="h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2"></div>
+                    </div>
+                    <div class="space-y-2 pt-4 mt-auto">
+                        <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded-2xl w-full"></div>
+                        <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded-2xl w-full"></div>
+                    </div>
+                </div>
+            </div>
+            <?php endfor; ?>
 
             <?php if(empty($books)): ?>
                 <div class="col-span-full py-16 text-center text-slate-400 dark:text-slate-400 font-medium">
@@ -507,52 +606,115 @@
         const searchInput = document.getElementById('search-input');
         const categorySelect = document.getElementById('category-select');
         const bookCards = document.querySelectorAll('.book-card');
+        const skeletonCards = document.querySelectorAll('.skeleton-card');
         const liveEmptyState = document.getElementById('live-empty-state');
+        let filterTimeout = null;
 
         function liveFilter() {
-            const query = searchInput.value.toLowerCase().trim();
-            const catId = categorySelect.value;
-            let matchCount = 0;
-
+            // Hide all book cards immediately and clear empty state
             bookCards.forEach(card => {
-                const title = card.getAttribute('data-title') || '';
-                const author = card.getAttribute('data-author') || '';
-                const category = card.getAttribute('data-category') || '';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(8px) scale(0.98)';
+                setTimeout(() => {
+                    if (card.style.opacity === '0') {
+                        card.style.display = 'none';
+                    }
+                }, 150);
+            });
+            if (liveEmptyState) {
+                liveEmptyState.style.opacity = '0';
+                setTimeout(() => {
+                    liveEmptyState.classList.add('hidden');
+                }, 150);
+            }
 
-                const queryMatch = !query || title.includes(query) || author.includes(query);
-                const categoryMatch = !catId || category === catId;
-
-                if (queryMatch && categoryMatch) {
-                    card.style.display = 'flex';
-                    // Trigger fade in animation
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, 20);
-                    matchCount++;
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(8px) scale(0.98)';
-                    setTimeout(() => {
-                        if (card.style.opacity === '0') {
-                            card.style.display = 'none';
-                        }
-                    }, 300);
-                }
+            // Show skeleton loader cards
+            skeletonCards.forEach(s => {
+                s.classList.remove('hidden');
+                setTimeout(() => {
+                    s.style.opacity = '1';
+                }, 20);
             });
 
-            // Handle empty state
-            if (liveEmptyState) {
-                if (matchCount === 0) {
-                    liveEmptyState.classList.remove('hidden');
+            // Debounce
+            if (filterTimeout) clearTimeout(filterTimeout);
+
+            filterTimeout = setTimeout(() => {
+                const query = searchInput.value.toLowerCase().trim();
+                const catId = categorySelect.value;
+                let matchCount = 0;
+
+                // Hide skeleton cards
+                skeletonCards.forEach(s => {
+                    s.style.opacity = '0';
                     setTimeout(() => {
-                        liveEmptyState.style.opacity = '1';
+                        s.classList.add('hidden');
+                    }, 150);
+                });
+
+                // Apply filtering to book cards after skeleton hides
+                setTimeout(() => {
+                    bookCards.forEach(card => {
+                        const title = card.getAttribute('data-title') || '';
+                        const author = card.getAttribute('data-author') || '';
+                        const category = card.getAttribute('data-category') || '';
+
+                        const queryMatch = !query || title.includes(query) || author.includes(query);
+                        const categoryMatch = !catId || category === catId;
+
+                        if (queryMatch && categoryMatch) {
+                            card.style.display = 'flex';
+                            // Trigger fade in animation
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0) scale(1)';
+                            }, 20);
+                            matchCount++;
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(8px) scale(0.98)';
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    // Handle empty state
+                    if (liveEmptyState) {
+                        if (matchCount === 0) {
+                            liveEmptyState.classList.remove('hidden');
+                            setTimeout(() => {
+                                liveEmptyState.style.opacity = '1';
+                            }, 20);
+                        } else {
+                            liveEmptyState.style.opacity = '0';
+                            setTimeout(() => {
+                                liveEmptyState.classList.add('hidden');
+                            }, 300);
+                        }
+                    }
+                }, 150);
+
+            }, 350); // 350ms of pulsing skeleton feel
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown-menu');
+            const chevron = document.getElementById('user-menu-chevron');
+            if (dropdown) {
+                const isHidden = dropdown.classList.contains('hidden');
+                if (isHidden) {
+                    dropdown.classList.remove('hidden');
+                    setTimeout(() => {
+                        dropdown.classList.remove('scale-95', 'opacity-0');
+                        dropdown.classList.add('scale-100', 'opacity-100');
                     }, 20);
+                    if (chevron) chevron.classList.add('rotate-180');
                 } else {
-                    liveEmptyState.style.opacity = '0';
+                    dropdown.classList.remove('scale-100', 'opacity-100');
+                    dropdown.classList.add('scale-95', 'opacity-0');
                     setTimeout(() => {
-                        liveEmptyState.classList.add('hidden');
-                    }, 300);
+                        dropdown.classList.add('hidden');
+                    }, 150);
+                    if (chevron) chevron.classList.remove('rotate-180');
                 }
             }
         }
@@ -560,10 +722,36 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcons();
 
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('user-menu-wrapper');
+                const dropdown = document.getElementById('user-dropdown-menu');
+                const chevron = document.getElementById('user-menu-chevron');
+                if (wrapper && !wrapper.contains(e.target)) {
+                    if (dropdown && !dropdown.classList.contains('hidden')) {
+                        dropdown.classList.remove('scale-100', 'opacity-100');
+                        dropdown.classList.add('scale-95', 'opacity-0');
+                        setTimeout(() => {
+                            dropdown.classList.add('hidden');
+                        }, 150);
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    }
+                }
+            });
+
             // Bind live filters
             if (searchInput && categorySelect) {
                 searchInput.addEventListener('input', liveFilter);
                 categorySelect.addEventListener('change', liveFilter);
+
+                // Intercept form submit to avoid reload
+                const searchForm = searchInput.closest('form');
+                if (searchForm) {
+                    searchForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        liveFilter();
+                    });
+                }
             }
 
             // Set transition styles for cards to allow smooth opacity and scale animations

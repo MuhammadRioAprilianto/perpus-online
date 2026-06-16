@@ -61,9 +61,58 @@
             <a href="<?= BASE_URL ?>/" class="font-extrabold text-2xl text-primary dark:text-indigo-400 tracking-tight flex items-center gap-2">
                 <span>Perpus<span class="text-accent">Online</span></span>
             </a>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-slate-500 dark:text-slate-400 font-medium hidden md:block">Halo, <span class="font-bold text-slate-800 dark:text-slate-200"><?= htmlspecialchars($_SESSION['user_name']) ?></span></span>
-                <a href="<?= BASE_URL ?>/logout" class="text-red-500 hover:text-red-700 font-bold transition-colors text-sm">Logout</a>
+            <div class="flex items-center gap-5">
+                <a href="<?= BASE_URL ?>/" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-bold transition-colors text-sm">Beranda</a>
+                <a href="<?= BASE_URL ?>/catalog" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-bold transition-colors text-sm">Katalog Buku</a>
+                <?php if(!isset($_SESSION['user_id'])): ?>
+                    <a href="<?= BASE_URL ?>/login" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-indigo-400 font-semibold transition-colors text-sm">Masuk</a>
+                    <a href="<?= BASE_URL ?>/register" class="bg-primary hover:bg-opacity-95 hover:shadow-lg hover:shadow-primary/20 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-0.5 text-sm">Daftar</a>
+                <?php else: ?>
+                    <!-- Profile Dropdown -->
+                    <div class="relative inline-block text-left" id="user-menu-wrapper">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-750 transition-all font-bold text-sm text-slate-700 dark:text-slate-200 focus:outline-none">
+                            <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black uppercase tracking-wider select-none">
+                                <?= substr($_SESSION['user_name'], 0, 1) ?>
+                            </div>
+                            <span class="max-w-[120px] truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 transition-transform duration-200" id="user-menu-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="user-dropdown-menu" class="origin-top-right absolute right-0 mt-3.5 w-56 rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 py-2.5 z-50 hidden transition-all duration-200 scale-95 opacity-0 transform">
+                            <div class="px-5 py-2.5 border-b border-slate-100 dark:border-slate-700/60 mb-2">
+                                <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Masuk sebagai</p>
+                                <p class="font-bold text-slate-800 dark:text-slate-200 text-sm truncate"><?= htmlspecialchars($_SESSION['user_name']) ?></p>
+                                <span class="inline-block bg-primary/10 text-primary dark:text-indigo-400 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md mt-1.5"><?= $_SESSION['user_role'] == 'admin' ? 'Pustakawan' : 'Member' ?></span>
+                            </div>
+
+                            <?php if($_SESSION['user_role'] == 'admin'): ?>
+                                <a href="<?= BASE_URL ?>/admin/dashboard" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('dashboard', 'w-4 h-4') ?>
+                                    <span>Dashboard Admin</span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= BASE_URL ?>/loans" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('clipboard', 'w-4 h-4') ?>
+                                    <span>Pinjamanku</span>
+                                </a>
+                                <a href="<?= BASE_URL ?>/cart" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-primary dark:hover:text-white transition-colors">
+                                    <?= renderIcon('cart', 'w-4 h-4') ?>
+                                    <span>Keranjang</span>
+                                </a>
+                            <?php endif; ?>
+                            
+                            <div class="border-t border-slate-100 dark:border-slate-700/60 my-2"></div>
+                            
+                            <a href="<?= BASE_URL ?>/logout" class="flex items-center gap-3.5 px-5 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+                                <?= renderIcon('logout', 'w-4 h-4 text-red-500') ?>
+                                <span>Keluar</span>
+                            </a>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Theme Toggle Button -->
                 <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors" title="Ubah Tema">
@@ -234,8 +283,48 @@
             }, 150);
         }
 
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown-menu');
+            const chevron = document.getElementById('user-menu-chevron');
+            if (dropdown) {
+                const isHidden = dropdown.classList.contains('hidden');
+                if (isHidden) {
+                    dropdown.classList.remove('hidden');
+                    setTimeout(() => {
+                        dropdown.classList.remove('scale-95', 'opacity-0');
+                        dropdown.classList.add('scale-100', 'opacity-100');
+                    }, 20);
+                    if (chevron) chevron.classList.add('rotate-180');
+                } else {
+                    dropdown.classList.remove('scale-100', 'opacity-100');
+                    dropdown.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        dropdown.classList.add('hidden');
+                    }, 150);
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcons();
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('user-menu-wrapper');
+                const dropdown = document.getElementById('user-dropdown-menu');
+                const chevron = document.getElementById('user-menu-chevron');
+                if (wrapper && !wrapper.contains(e.target)) {
+                    if (dropdown && !dropdown.classList.contains('hidden')) {
+                        dropdown.classList.remove('scale-100', 'opacity-100');
+                        dropdown.classList.add('scale-95', 'opacity-0');
+                        setTimeout(() => {
+                            dropdown.classList.add('hidden');
+                        }, 150);
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    }
+                }
+            });
         });
     </script>
 </body>
