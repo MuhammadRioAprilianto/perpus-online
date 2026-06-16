@@ -8,8 +8,9 @@
  * authentication checks, and formatting.
  */
 
-/**
- * Redirect the client to a specified URL p<?php
+// Require the icons component so renderIcon() is available globally
+require_once APP_ROOT . '/views/components/icons.php';
+
 // 1. Fungsi untuk memanggil aset statis lokal (CSS, JS, dan Gambar Cover)
 // Fungsi ini memastikan gambar milikmu dipanggil dengan path yang benar dari folder public/
 function asset($path) {
@@ -37,13 +38,8 @@ function sisaWaktuBatal($request_time) {
     return floor(($batas_detik - $selisih_detik) / 60); // Mengembalikan sisa menit
 }
 
-// 4. Fungsi cepat untuk mengecek apakah user yang login adalah Admin
-function isAdmin() {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-}ath.
+/**
+ * Redirect the client to a specified URL path.
  *
  * @param string $path The relative URL path to redirect to.
  * @return void

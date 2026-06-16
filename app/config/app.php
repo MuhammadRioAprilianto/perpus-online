@@ -2,6 +2,10 @@
 // Tentukan URL dasar aplikasi (sesuaikan dengan nama folder di htdocs XAMPP kamu)
 // Misalnya jika foldernya perpus-online:
 define('BASEURL', 'http://localhost/perpus-online/public');
+define('BASE_URL', BASEURL);
+
+define('APP_ROOT', dirname(__DIR__));
+define('PUBLIC_ROOT', APP_ROOT . '/../public');
 
 // Nama Aplikasi
 define('APP_NAME', 'Website Perpustakaan Online');
