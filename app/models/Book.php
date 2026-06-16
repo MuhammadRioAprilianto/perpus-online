@@ -42,4 +42,30 @@ class Book {
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
+
+    public function getBookById($id) {
+        $this->db->query("SELECT * FROM books WHERE id = :id");
+        $this->db->bind(':id', $id);
+        return $this->db->single();
+    }
+
+    // Memperbarui data buku
+    public function updateBook($data) {
+        // Cek apakah Admin mengupload gambar sampul baru
+        if ($data['cover_image']) {
+            $this->db->query("UPDATE books SET title = :title, author = :author, category_id = :category_id, cover_image = :cover_image, stock = :stock WHERE id = :id");
+            $this->db->bind(':cover_image', $data['cover_image']);
+        } else {
+            // Jika tidak ada gambar baru, jangan update kolom cover_image
+            $this->db->query("UPDATE books SET title = :title, author = :author, category_id = :category_id, stock = :stock WHERE id = :id");
+        }
+        
+        $this->db->bind(':id', $data['id']);
+        $this->db->bind(':title', $data['title']);
+        $this->db->bind(':author', $data['author']);
+        $this->db->bind(':category_id', $data['category_id']);
+        $this->db->bind(':stock', $data['stock']);
+        
+        return $this->db->execute();
+    }
 }
