@@ -7,16 +7,36 @@ class Book {
         $this->db = new Database();
     }
 
-    // Mengambil semua buku beserta nama kategorinya
-    public function getAllBooks() {
-        $this->db->query("SELECT books.*, categories.name as category_name 
-                          FROM books 
-                          LEFT JOIN categories ON books.category_id = categories.id 
-                          ORDER BY books.created_at DESC");
+    // Mengambil buku dengan dukungan pencarian dan filter kategori
+    public function getAllBooks($search = '', $categoryId = '') {
+        $query = "SELECT books.*, categories.name as category_name 
+                  FROM books 
+                  LEFT JOIN categories ON books.category_id = categories.id 
+                  WHERE 1=1"; 
+        
+        if (!empty($search)) {
+            $query .= " AND (books.title LIKE :search OR books.author LIKE :search)";
+        }
+        
+        if (!empty($categoryId)) {
+            $query .= " AND books.category_id = :category_id";
+        }
+        
+        $query .= " ORDER BY books.created_at DESC";
+        
+        $this->db->query($query);
+        
+        if (!empty($search)) {
+            $this->db->bind(':search', "%$search%");
+        }
+        if (!empty($categoryId)) {
+            $this->db->bind(':category_id', $categoryId);
+        }
+        
         return $this->db->resultSet();
     }
 
-    // Mengambil semua kategori untuk dropdown di form
+    // Mengambil semua kategori
     public function getCategories() {
         $this->db->query("SELECT * FROM categories ORDER BY name ASC");
         return $this->db->resultSet();
@@ -43,6 +63,7 @@ class Book {
         return $this->db->execute();
     }
 
+    // Mengambil satu buku spesifik untuk form edit
     public function getBookById($id) {
         $this->db->query("SELECT * FROM books WHERE id = :id");
         $this->db->bind(':id', $id);
@@ -51,12 +72,10 @@ class Book {
 
     // Memperbarui data buku
     public function updateBook($data) {
-        // Cek apakah Admin mengupload gambar sampul baru
         if ($data['cover_image']) {
             $this->db->query("UPDATE books SET title = :title, author = :author, category_id = :category_id, cover_image = :cover_image, stock = :stock WHERE id = :id");
             $this->db->bind(':cover_image', $data['cover_image']);
         } else {
-            // Jika tidak ada gambar baru, jangan update kolom cover_image
             $this->db->query("UPDATE books SET title = :title, author = :author, category_id = :category_id, stock = :stock WHERE id = :id");
         }
         
@@ -69,7 +88,7 @@ class Book {
         return $this->db->execute();
     }
 
-    // Menghitung total buku di katalog
+    // Menghitung total buku di katalog untuk dashboard
     public function getTotalBooks() {
         $this->db->query("SELECT COUNT(*) as total FROM books");
         $result = $this->db->single();

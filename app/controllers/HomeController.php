@@ -1,21 +1,28 @@
 <?php
-require_once '../app/models/BookModel.php';
-require_once '../app/config/database.php';
 
 class HomeController {
     private $bookModel;
 
     public function __construct() {
-        // Menginisiasi Data Access Layer (DAL) untuk buku
-        $this->bookModel = new BookModel();
+        require_once '../app/models/Book.php';
+        $this->bookModel = new Book();
+        
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
-    // Method default untuk halaman utama
     public function index() {
-        // Mengambil semua data buku dari database untuk ditampilkan di katalog publik
-        $books = $this->bookModel->getAllBooks();
+        // Tangkap parameter dari URL (jika ada)
+        $search = $_GET['search'] ?? '';
+        $categoryId = $_GET['category'] ?? '';
+
+        // Ambil data buku berdasarkan filter yang aktif
+        $books = $this->bookModel->getAllBooks($search, $categoryId);
         
-        // Memanggil Presentation Layer (Tampilan halaman utama yang sudah kita buat)
-        require_once '../app/views/home.php';
+        // Ambil data kategori untuk dropdown filter di view
+        $categories = $this->bookModel->getCategories();
+        
+        require_once '../app/views/home/index.php';
     }
 }
